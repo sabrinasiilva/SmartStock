@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Estoque Preditivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .sidebar-collapsed {
+            width: 70px;
+        }
+        .sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+        .content-expanded {
+            margin-left: 70px;
+        }
+        .low-stock {
+            border-left: 4px solid #ef4444;
+        }
+        .critical-stock {
+            border-left: 4px solid #dc2626;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-gray-50 text-gray-700 w-64 flex-shrink-0 border-r">
+            <div class="p-4 flex items-center border-b border-gray-200">
+                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white text-xl font-bold">
+                    SS
+                </div>
+                <span class="sidebar-text ml-3 text-xl font-bold text-blue-600">SmartStock</span>
+            </div>
+            <nav class="p-4">
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-gray-200">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="sidebar-text ml-3">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded bg-gray-200">
+                            <i class="fas fa-boxes"></i>
+                            <span class="sidebar-text ml-3">Estoque</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-200">
+                            <i class="fas fa-chart-line"></i>
+                            <span class="sidebar-text ml-3">Previsões</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-bell"></i>
+                            <span class="sidebar-text ml-3">Alertas</span>
+                            <span class="sidebar-text ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">5</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-cog"></i>
+                            <span class="sidebar-text ml-3">Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow">
+                <div class="flex justify-between items-center p-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="mr-4 text-gray-600 hover:text-blue-800">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800">Gestão de Estoque com Previsão de Ruptura</h1>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative">
+                            <input type="text" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <div class="ml-4 relative">
+                            <button class="p-2 rounded-full hover:bg-gray-200">
+                                <i class="fas fa-bell text-gray-600"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                        <div class="ml-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0eb04c81-b37b-41b1-bb7b-06b8c7edd286.png" alt="Foto de perfil do administrador do sistema, pessoa profissional com traje formal" class="h-10 w-10 rounded-full">
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Total de Itens</p>
+                                <h3 class="text-2xl font-bold">1,248</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-box text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-up"></i> 5.2% desde último mês</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Itens em Alerta</p>
+                                <h3 class="text-2xl font-bold text-red-600">24</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-red-500 text-sm"><i class="fas fa-arrow-up"></i> 12% desde última semana</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Previsão de Ruptura</p>
+                                <h3 class="text-2xl font-bold text-orange-600">8</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                                <i class="fas fa-chart-line text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-orange-500 text-sm">3 novos riscos detectados</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Vendas Perdidas</p>
+                                <h3 class="text-2xl font-bold">R$ 3,540</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-money-bill-wave text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-down"></i> 18% redução</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico e Tabela -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Gráfico de Previsão -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Previsão de Demanda - Próximos 30 Dias</h2>
+                            <div class="flex">
+                                <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded mr-2 text-sm">30 dias</button>
+                                <button class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-sm">90 dias</button>
+                            </div>
+                        </div>
+                        <canvas id="demandChart" height="250"></canvas>
+                    </div>
+
+                    <!-- Alertas de Ruptura -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">Alertas de Ruptura Iminente</h2>
+                        <div class="space-y-4">
+                            <div class="p-4 rounded-lg critical-stock bg-white shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">Smartphone XYZ</h4>
+                                        <p class="text-sm text-gray-600">Estoque atual: 2 unidades</p>
+                                        <p class="text-red-600 text-sm mt-1"><i class="fas fa-fire"></i> Ruptura em 3 dias</p>
+                                    </div>
+                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-lg low-stock bg-white shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">Notebook ABC</h4>
+                                        <p class="text-sm text-gray-600">Estoque atual: 5 unidades</p>
+                                        <p class="text-orange-600 text-sm mt-1"><i class="fas fa-exclamation-circle"></i> Ruptura em 7 dias</p>
+                                    </div>
+                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-lg low-stock bg-white shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">Fone de Ouvido Pro</h4>
+                                        <p class="text-sm text-gray-600">Estoque atual: 8 unidades</p>
+                                        <p class="text-orange-600 text-sm mt-1"><i class="fas fa-exclamation-circle"></i> Ruptura em 10 dias</p>
+                                    </div>
+                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Estoque -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Lista de Estoque</h2>
+                        <div class="flex space-x-2">
+                            <select class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Todos</option>
+                                <option>Em alerta</option>
+                                <option>Estável</option>
+                            </select>
+                            <button class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                <i class="fas fa-plus mr-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demanda Diária</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias até Ruptura</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f2135e24-15df-4e39-8ddd-3884c14fc140.png" alt="Foto do produto Smartphone XYZ na cor preta" class="h-10 w-10 rounded">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Smartphone XYZ</div>
+                                                <div class="text-sm text-gray-500">SKU: SMP-XYZ-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">2</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">0.8/dia</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-red-600 font-semibold">3 dias</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Crítico</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
+                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7146c7ee-812c-4010-8611-4ad01c2401c7.png" alt="Foto do produto Notebook ABC na cor prata" class="h-10 w-10 rounded">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Notebook ABC</div>
+                                                <div class="text-sm text-gray-500">SKU: NB-ABC-2023</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">5</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">0.6/dia</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-orange-600 font-semibold">7 dias</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Alerta</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
+                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/95f5abd7-23e5-4926-84be-fb83ad01099c.png" alt="Foto do produto Fone de Ouvido Pro na cor preta com detalhes vermelhos" class="h-10 w-10 rounded">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Fone de Ouvido Pro</div>
+                                                <div class="text-sm text-gray-500">SKU: FONE-PRO-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">8</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">0.7/dia</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-orange-600 font-semibold">10 dias</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Alerta</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
+                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/36f1f54b-5238-463d-a21c-a59fca7a78e9.png" alt="Foto do produto Teclado Mecânico RGB na cor preta com iluminação" class="h-10 w-10 rounded">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Teclado Mecânico RGB</div>
+                                                <div class="text-sm text-gray-500">SKU: TEC-RGB-2023</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">24</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">0.5/dia</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">48 dias</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Estável</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
+                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('sidebar-collapsed');
+            document.querySelector('.content-expanded').classList.toggle('ml-64');
+            document.querySelector('.content-expanded').classList.toggle('ml-16');
+        });
+
+        // Demand Chart
+        const ctx = document.getElementById('demandChart').getContext('2d');
+        const demandChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `${i+1}/06`),
+                datasets: [{
+                    label: 'Demanda Prevista',
+                    data: [20, 22, 25, 28, 30, 32, 35, 38, 42, 45, 50, 55, 60, 65, 70, 75, 80,           85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }, {
+                    label: 'Estoque Atual',
+                    data: [150, 148, 145, 142, 140, 137, 134, 130, 126, 122, 118, 113, 108, 102, 96, 90, 83, 75, 67, 58, 48, 38, 27, 15, 2, 0, 0, 0, 0, 0],
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    annotation: {
+                        annotations: [{
+                            type: 'line',
+                            mode: 'horizontal',
+                            scaleID: 'y',
+                            value: 10,
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [6, 6],
+                            label: {
+                                content: 'Limite de Ruptura',
+                                enabled: true,
+                                position: 'left'
+                            }
+                        }]
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Quantidade'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Próximos 30 Dias'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Simulando dados para a previsão de ruptura
+        function simulateStock(days, initialStock, dailyDemand) {
+            return initialStock - (dailyDemand * days);
+        }
+    </script>
+</body>
+</html>
+
