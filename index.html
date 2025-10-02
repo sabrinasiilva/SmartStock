@@ -17,11 +17,8 @@
         .sidebar-collapsed .sidebar-text {
             display: none;
         }
-        .content-expanded {
-            margin-left: 70px;
-        }
         .low-stock {
-            border-left: 4px solid #ef4444;
+            border-left: 4px solid #f59e0b;
         }
         .critical-stock {
             border-left: 4px solid #dc2626;
@@ -29,435 +26,2339 @@
         }
         @keyframes pulse {
             0% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .notification.success { background-color: #10b981; }
+        .notification.error { background-color: #ef4444; }
+        .notification.info { background-color: #3b82f6; }
+        .notification.warning { background-color: #f59e0b; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .active-page {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-pending { background-color: #fef3c7; color: #d97706; }
+        .status-processing { background-color: #dbeafe; color: #1e40af; }
+        .status-shipped { background-color: #d1fae5; color: #065f46; }
+        .status-delivered { background-color: #f3f4f6; color: #374151; }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <div class="sidebar bg-gray-50 text-gray-700 w-64 flex-shrink-0 border-r">
-            <div class="p-4 flex items-center border-b border-gray-200">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white text-xl font-bold">
-                    SS
+    <!-- Sistema de Notificações -->
+    <div id="notificationsContainer"></div>
+
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <div class="flex justify-center">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-lg bg-blue-600 text-white text-2xl font-bold">
+                        SS
+                    </div>
                 </div>
-                <span class="sidebar-text ml-3 text-xl font-bold text-blue-600">SmartStock</span>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    SmartStock
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Sistema de Gestão de Estoque Preditivo
+                </p>
             </div>
-            <nav class="p-4">
-                <ul>
-                    <li class="mb-2">
-                        <a href="#" class="flex items-center p-2 rounded hover:bg-gray-200">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span class="sidebar-text ml-3">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" class="flex items-center p-2 rounded bg-gray-200">
-                            <i class="fas fa-boxes"></i>
-                            <span class="sidebar-text ml-3">Estoque</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-200">
-                            <i class="fas fa-chart-line"></i>
-                            <span class="sidebar-text ml-3">Previsões</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
-                            <i class="fas fa-bell"></i>
-                            <span class="sidebar-text ml-3">Alertas</span>
-                            <span class="sidebar-text ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">5</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
-                            <i class="fas fa-cog"></i>
-                            <span class="sidebar-text ml-3">Configurações</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <form id="loginForm" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="email" class="sr-only">Email</label>
+                        <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email" value="admin@smartstock.com">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Senha</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Senha" value="admin123">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Entrar
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <div class="text-sm">
+                        <span class="font-medium">Credenciais de teste:</span><br>
+                        Admin: admin@smartstock.com / admin123<br>
+                        Expedição: expedicao@smartstock.com / expedicao123
+                    </div>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
-            <!-- Top Bar -->
-            <header class="bg-white shadow">
-                <div class="flex justify-between items-center p-4">
+    <!-- Sistema Principal (inicialmente oculto) -->
+    <div id="mainSystem" class="hidden">
+        <div class="flex h-screen overflow-hidden">
+            <!-- Sidebar -->
+            <div class="sidebar bg-gray-50 text-gray-700 w-64 flex-shrink-0 border-r">
+                <div class="p-4 flex items-center border-b border-gray-200">
+                    <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white text-xl font-bold">
+                        SS
+                    </div>
+                    <span class="sidebar-text ml-3 text-xl font-bold text-blue-600">SmartStock</span>
+                </div>
+                <nav class="p-4">
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#" data-page="dashboard" class="flex items-center p-2 rounded hover:bg-gray-200 active-page">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span class="sidebar-text ml-3">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" data-page="estoque" class="flex items-center p-2 rounded hover:bg-gray-200">
+                                <i class="fas fa-boxes"></i>
+                                <span class="sidebar-text ml-3">Estoque</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" data-page="expedicao" class="flex items-center p-2 rounded hover:bg-gray-200">
+                                <i class="fas fa-shipping-fast"></i>
+                                <span class="sidebar-text ml-3">Expedição</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" data-page="previsoes" class="flex items-center p-2 rounded hover:bg-gray-200">
+                                <i class="fas fa-chart-line"></i>
+                                <span class="sidebar-text ml-3">Previsões</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" data-page="alertas" class="flex items-center p-2 rounded hover:bg-gray-200">
+                                <i class="fas fa-bell"></i>
+                                <span class="sidebar-text ml-3">Alertas</span>
+                                <span id="alertCount" class="sidebar-text ml-auto bg-red-500 text-xs px-2 py-1 rounded-full text-white">3</span>
+                            </a>
+                        </li>
+                        <li id="adminSection" class="mb-2">
+                            <a href="#" data-page="configuracoes" class="flex items-center p-2 rounded hover:bg-gray-200">
+                                <i class="fas fa-cog"></i>
+                                <span class="sidebar-text ml-3">Configurações</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="absolute bottom-0 w-full p-4 border-t border-gray-200">
                     <div class="flex items-center">
-                        <button id="sidebarToggle" class="mr-4 text-gray-600 hover:text-blue-800">
-                            <i class="fas fa-bars"></i>
+                        <img id="userAvatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Foto de perfil" class="h-8 w-8 rounded-full">
+                        <div class="sidebar-text ml-3">
+                            <p id="userName" class="text-sm font-medium">Administrador</p>
+                            <p id="userRole" class="text-xs text-gray-500">Administrador</p>
+                        </div>
+                        <button id="logoutBtn" class="sidebar-text ml-auto text-gray-500 hover:text-red-500">
+                            <i class="fas fa-sign-out-alt"></i>
                         </button>
-                        <h1 class="text-xl font-semibold text-gray-800">Gestão de Estoque com Previsão de Ruptura</h1>
                     </div>
-                    <div class="flex items-center">
-                        <div class="relative">
-                            <input type="text" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                        <div class="ml-4 relative">
-                            <button class="p-2 rounded-full hover:bg-gray-200">
-                                <i class="fas fa-bell text-gray-600"></i>
-                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto transition-all duration-300" id="mainContent">
+                <!-- Top Bar -->
+                <header class="bg-white shadow">
+                    <div class="flex justify-between items-center p-4">
+                        <div class="flex items-center">
+                            <button id="sidebarToggle" class="mr-4 text-gray-600 hover:text-blue-800">
+                                <i class="fas fa-bars"></i>
                             </button>
+                            <h1 id="pageTitle" class="text-xl font-semibold text-gray-800">Dashboard</h1>
                         </div>
-                        <div class="ml-4">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0eb04c81-b37b-41b1-bb7b-06b8c7edd286.png" alt="Foto de perfil do administrador do sistema, pessoa profissional com traje formal" class="h-10 w-10 rounded-full">
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <input type="text" id="globalSearch" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <div class="ml-4 relative">
+                                <button id="notificationBtn" class="p-2 rounded-full hover:bg-gray-200">
+                                    <i class="fas fa-bell text-gray-600"></i>
+                                    <span id="notificationBadge" class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            <!-- Dashboard Content -->
-            <main class="p-6">
-                <!-- Status Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500">Total de Itens</p>
-                                <h3 class="text-2xl font-bold">1,248</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                                <i class="fas fa-box text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-up"></i> 5.2% desde último mês</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500">Itens em Alerta</p>
-                                <h3 class="text-2xl font-bold text-red-600">24</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-red-100 text-red-600">
-                                <i class="fas fa-exclamation-triangle text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-red-500 text-sm"><i class="fas fa-arrow-up"></i> 12% desde última semana</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500">Previsão de Ruptura</p>
-                                <h3 class="text-2xl font-bold text-orange-600">8</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-orange-100 text-orange-600">
-                                <i class="fas fa-chart-line text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-orange-500 text-sm">3 novos riscos detectados</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500">Vendas Perdidas</p>
-                                <h3 class="text-2xl font-bold">R$ 3,540</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                                <i class="fas fa-money-bill-wave text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-down"></i> 18% redução</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gráfico e Tabela -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <!-- Gráfico de Previsão -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold">Previsão de Demanda - Próximos 30 Dias</h2>
-                            <div class="flex">
-                                <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded mr-2 text-sm">30 dias</button>
-                                <button class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-sm">90 dias</button>
-                            </div>
-                        </div>
-                        <canvas id="demandChart" height="250"></canvas>
-                    </div>
-
-                    <!-- Alertas de Ruptura -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-semibold mb-4">Alertas de Ruptura Iminente</h2>
-                        <div class="space-y-4">
-                            <div class="p-4 rounded-lg critical-stock bg-white shadow">
-                                <div class="flex justify-between items-start">
+                <!-- Conteúdo das Páginas -->
+                <!-- Dashboard -->
+                <div id="dashboard" class="page-content active">
+                    <main class="p-6">
+                        <!-- Status Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                                <div class="flex items-center justify-between">
                                     <div>
-                                        <h4 class="font-semibold">Smartphone XYZ</h4>
-                                        <p class="text-sm text-gray-600">Estoque atual: 2 unidades</p>
-                                        <p class="text-red-600 text-sm mt-1"><i class="fas fa-fire"></i> Ruptura em 3 dias</p>
+                                        <p class="text-gray-500">Total de Itens</p>
+                                        <h3 id="totalItems" class="text-2xl font-bold">42</h3>
                                     </div>
-                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                        <i class="fas fa-box text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-green-500 text-sm"><i class="fas fa-arrow-up"></i> <span id="itemsGrowth">12%</span> desde último mês</span>
                                 </div>
                             </div>
 
-                            <div class="p-4 rounded-lg low-stock bg-white shadow">
-                                <div class="flex justify-between items-start">
+                            <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                                <div class="flex items-center justify-between">
                                     <div>
-                                        <h4 class="font-semibold">Notebook ABC</h4>
-                                        <p class="text-sm text-gray-600">Estoque atual: 5 unidades</p>
-                                        <p class="text-orange-600 text-sm mt-1"><i class="fas fa-exclamation-circle"></i> Ruptura em 7 dias</p>
+                                        <p class="text-gray-500">Itens em Alerta</p>
+                                        <h3 id="alertItems" class="text-2xl font-bold text-red-600">8</h3>
                                     </div>
-                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-red-500 text-sm"><i class="fas fa-arrow-up"></i> <span id="alertsGrowth">5%</span> desde última semana</span>
                                 </div>
                             </div>
 
-                            <div class="p-4 rounded-lg low-stock bg-white shadow">
-                                <div class="flex justify-between items-start">
+                            <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                                <div class="flex items-center justify-between">
                                     <div>
-                                        <h4 class="font-semibold">Fone de Ouvido Pro</h4>
-                                        <p class="text-sm text-gray-600">Estoque atual: 8 unidades</p>
-                                        <p class="text-orange-600 text-sm mt-1"><i class="fas fa-exclamation-circle"></i> Ruptura em 10 dias</p>
+                                        <p class="text-gray-500">Previsão de Ruptura</p>
+                                        <h3 id="ruptureItems" class="text-2xl font-bold text-orange-600">3</h3>
                                     </div>
-                                    <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Reabastecer</button>
+                                    <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                                        <i class="fas fa-chart-line text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <span id="newRisks" class="text-orange-500 text-sm">2 novos riscos detectados</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow p-6 card-hover transition-all duration-300">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-500">Vendas Perdidas</p>
+                                        <h3 id="lostSales" class="text-2xl font-bold">R$ 2.450</h3>
+                                    </div>
+                                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                        <i class="fas fa-money-bill-wave text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-green-500 text-sm"><i class="fas fa-arrow-down"></i> <span id="salesReduction">15%</span> redução</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Gráfico e Tabela -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <!-- Gráfico de Previsão -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold">Previsão de Demanda - Próximos 30 Dias</h2>
+                                    <div class="flex">
+                                        <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded mr-2 text-sm forecast-period active" data-period="30">30 dias</button>
+                                        <button class="px-3 py-1 bg-gray-100 text-gray-600 rounded text-sm forecast-period" data-period="90">90 dias</button>
+                                    </div>
+                                </div>
+                                <canvas id="demandChart" height="250"></canvas>
+                            </div>
+
+                            <!-- Alertas de Ruptura -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="text-xl font-semibold mb-4">Alertas de Ruptura Iminente</h2>
+                                <div id="ruptureAlerts" class="space-y-4">
+                                    <!-- Conteúdo será preenchido via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabela de Estoque -->
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b flex justify-between items-center">
+                                <h2 class="text-xl font-semibold">Lista de Estoque</h2>
+                                <div class="flex space-x-2">
+                                    <select id="stockFilter" class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="all">Todos</option>
+                                        <option value="alert">Em alerta</option>
+                                        <option value="stable">Estável</option>
+                                    </select>
+                                    <button id="addProductBtn" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-1"></i> Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demanda Diária</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias até Ruptura</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockTableBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Conteúdo será preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </main>
                 </div>
 
-                <!-- Tabela de Estoque -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="p-4 border-b flex justify-between items-center">
-                        <h2 class="text-xl font-semibold">Lista de Estoque</h2>
-                        <div class="flex space-x-2">
-                            <select class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option>Todos</option>
-                                <option>Em alerta</option>
-                                <option>Estável</option>
-                            </select>
-                            <button class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
-                                <i class="fas fa-plus mr-1"></i> Adicionar
-                            </button>
+                <!-- Estoque -->
+                <div id="estoque" class="page-content">
+                    <main class="p-6">
+                        <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                            <div class="p-4 border-b flex justify-between items-center">
+                                <h2 class="text-xl font-semibold">Gestão de Estoque</h2>
+                                <div class="flex space-x-2">
+                                    <button id="importStockBtn" class="bg-green-600 text-white px-4 py-1 rounded text-sm hover:bg-green-700">
+                                        <i class="fas fa-file-import mr-1"></i> Importar
+                                    </button>
+                                    <button id="exportStockBtn" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                        <i class="fas fa-file-export mr-1"></i> Exportar
+                                    </button>
+                                    <button id="addStockProductBtn" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-1"></i> Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-4 border-b">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Categoria</label>
+                                        <select id="categoryFilter" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                            <option value="">Todas</option>
+                                            <option value="eletronicos">Eletrônicos</option>
+                                            <option value="informatica">Informática</option>
+                                            <option value="moveis">Móveis</option>
+                                            <option value="vestuario">Vestuário</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                                        <select id="statusFilter" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                            <option value="">Todos</option>
+                                            <option value="ativo">Ativo</option>
+                                            <option value="inativo">Inativo</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Buscar</label>
+                                        <input type="text" id="searchStock" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Nome ou SKU">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mínimo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockManagementBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Conteúdo será preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+                    </main>
+                </div>
+
+                <!-- Expedição -->
+                <div id="expedicao" class="page-content">
+                    <main class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="text-xl font-semibold mb-4">Pedidos Pendentes</h2>
+                                <div id="pendingOrders" class="space-y-4">
+                                    <!-- Conteúdo será preenchido via JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow p-6 lg:col-span-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold">Processar Expedição</h2>
+                                    <button id="newOrderBtn" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-1"></i> Novo Pedido
+                                    </button>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pedido</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Itens</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="expeditionTableBody" class="bg-white divide-y divide-gray-200">
+                                            <!-- Conteúdo será preenchido via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- Previsões -->
+                <div id="previsoes" class="page-content">
+                    <main class="p-6">
+                        <div class="bg-white rounded-lg shadow p-6 mb-6">
+                            <h2 class="text-xl font-semibold mb-4">Previsões de Demanda</h2>
+                            <div class="mb-4">
+                                <select id="forecastPeriod" class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="30">30 dias</option>
+                                    <option value="60">60 dias</option>
+                                    <option value="90">90 dias</option>
+                                </select>
+                            </div>
+                            <canvas id="forecastChart" height="300"></canvas>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="text-xl font-semibold mb-4">Recomendações de Compra</h2>
+                                <div id="purchaseRecommendations" class="space-y-4">
+                                    <!-- Conteúdo será preenchido via JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="text-xl font-semibold mb-4">Análise de Sazonalidade</h2>
+                                <canvas id="seasonalityChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- Alertas -->
+                <div id="alertas" class="page-content">
+                    <main class="p-6">
+                        <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                            <div class="p-4 border-b flex justify-between items-center">
+                                <h2 class="text-xl font-semibold">Alertas do Sistema</h2>
+                                <div class="flex space-x-2">
+                                    <button id="markAllReadBtn" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700">
+                                        <i class="fas fa-check-double mr-1"></i> Marcar Todos como Lidos
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensagem</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alertsTableBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Conteúdo será preenchido via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- Configurações (Apenas Admin) -->
+                <div id="configuracoes" class="page-content">
+                    <main class="p-6">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b">
+                                <h2 class="text-xl font-semibold">Configurações do Sistema</h2>
+                            </div>
+                            <div class="p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 class="text-lg font-medium mb-4">Parâmetros de Estoque</h3>
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700">Dias para alerta de estoque baixo</label>
+                                                <input type="number" id="lowStockDays" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="7">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700">Dias para alerta crítico</label>
+                                                <input type="number" id="criticalStockDays" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="3">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-medium mb-4">Usuários do Sistema</h3>
+                                        <div class="space-y-4">
+                                            <button id="addUserBtn" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                                <i class="fas fa-user-plus mr-1"></i> Adicionar Usuário
+                                            </button>
+                                            <div id="usersList" class="space-y-2">
+                                                <!-- Conteúdo será preenchido via JavaScript -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <button id="saveSettingsBtn" class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">
+                                        <i class="fas fa-save mr-1"></i> Salvar Configurações
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar Produto -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Adicionar Produto</h3>
+                <button id="closeProductModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nome do Produto *</label>
+                        <input type="text" id="productName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demanda Diária</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias até Ruptura</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f2135e24-15df-4e39-8ddd-3884c14fc140.png" alt="Foto do produto Smartphone XYZ na cor preta" class="h-10 w-10 rounded">
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Smartphone XYZ</div>
-                                                <div class="text-sm text-gray-500">SKU: SMP-XYZ-001</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">2</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">0.8/dia</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-red-600 font-semibold">3 dias</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Crítico</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
-                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7146c7ee-812c-4010-8611-4ad01c2401c7.png" alt="Foto do produto Notebook ABC na cor prata" class="h-10 w-10 rounded">
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Notebook ABC</div>
-                                                <div class="text-sm text-gray-500">SKU: NB-ABC-2023</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">5</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">0.6/dia</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-orange-600 font-semibold">7 dias</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Alerta</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
-                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/95f5abd7-23e5-4926-84be-fb83ad01099c.png" alt="Foto do produto Fone de Ouvido Pro na cor preta com detalhes vermelhos" class="h-10 w-10 rounded">
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Fone de Ouvido Pro</div>
-                                                <div class="text-sm text-gray-500">SKU: FONE-PRO-001</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">8</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">0.7/dia</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-orange-600 font-semibold">10 dias</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Alerta</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
-                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/36f1f54b-5238-463d-a21c-a59fca7a78e9.png" alt="Foto do produto Teclado Mecânico RGB na cor preta com iluminação" class="h-10 w-10 rounded">
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Teclado Mecânico RGB</div>
-                                                <div class="text-sm text-gray-500">SKU: TEC-RGB-2023</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">24</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">0.5/dia</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">48 dias</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Estável</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
-                                        <button class="text-green-600 hover:text-green-900">Pedido</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">SKU *</label>
+                        <input type="text" id="productSKU" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Categoria *</label>
+                        <select id="productCategory" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                            <option value="">Selecione</option>
+                            <option value="eletronicos">Eletrônicos</option>
+                            <option value="informatica">Informática</option>
+                            <option value="moveis">Móveis</option>
+                            <option value="vestuario">Vestuário</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Estoque Inicial *</label>
+                        <input type="number" id="productStock" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Estoque Mínimo *</label>
+                        <input type="number" id="productMinStock" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required min="1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Preço *</label>
+                        <input type="number" step="0.01" id="productPrice" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required min="0">
                     </div>
                 </div>
-            </main>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Descrição</label>
+                    <textarea id="productDescription" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="3"></textarea>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button type="button" id="cancelProductBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2 hover:bg-gray-400">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        <i class="fas fa-save mr-1"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Novo Pedido -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Novo Pedido</h3>
+                <button id="closeOrderModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="orderForm">
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Cliente *</label>
+                        <input type="text" id="orderCustomer" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Itens do Pedido *</label>
+                        <div id="orderItems" class="mt-2 space-y-2">
+                            <div class="flex space-x-2 items-center">
+                                <select class="product-select border rounded px-3 py-2 flex-1">
+                                    <option value="">Selecione um produto</option>
+                                </select>
+                                <input type="number" class="quantity-input border rounded px-3 py-2 w-20" placeholder="Qtd" min="1" value="1">
+                                <button type="button" class="remove-item-btn text-red-600 hover:text-red-800">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addOrderItemBtn" class="mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-300">
+                            <i class="fas fa-plus mr-1"></i> Adicionar Item
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Observações</label>
+                    <textarea id="orderNotes" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="2"></textarea>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button type="button" id="cancelOrderBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2 hover:bg-gray-400">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        <i class="fas fa-check mr-1"></i> Criar Pedido
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        // Toggle Sidebar
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('sidebar-collapsed');
-            document.querySelector('.content-expanded').classList.toggle('ml-64');
-            document.querySelector('.content-expanded').classList.toggle('ml-16');
-        });
+        // =============================================
+        // DADOS MOCK PARA SIMULAÇÃO
+        // =============================================
 
-        // Demand Chart
-        const ctx = document.getElementById('demandChart').getContext('2d');
-        const demandChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 30}, (_, i) => `${i+1}/06`),
-                datasets: [{
-                    label: 'Demanda Prevista',
-                    data: [20, 22, 25, 28, 30, 32, 35, 38, 42, 45, 50, 55, 60, 65, 70, 75, 80,           85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145],
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                }, {
-                    label: 'Estoque Atual',
-                    data: [150, 148, 145, 142, 140, 137, 134, 130, 126, 122, 118, 113, 108, 102, 96, 90, 83, 75, 67, 58, 48, 38, 27, 15, 2, 0, 0, 0, 0, 0],
-                    borderColor: 'rgb(239, 68, 68)',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    annotation: {
-                        annotations: [{
-                            type: 'line',
-                            mode: 'horizontal',
-                            scaleID: 'y',
-                            value: 10,
-                            borderColor: 'red',
-                            borderWidth: 2,
-                            borderDash: [6, 6],
-                            label: {
-                                content: 'Limite de Ruptura',
-                                enabled: true,
-                                position: 'left'
-                            }
-                        }]
-                    }
+        const mockData = {
+            users: [
+                {
+                    email: 'admin@smartstock.com',
+                    password: 'admin123',
+                    name: 'Administrador',
+                    role: 'admin',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Quantidade'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Próximos 30 Dias'
-                        }
+                {
+                    email: 'expedicao@smartstock.com',
+                    password: 'expedicao123',
+                    name: 'João Expedição',
+                    role: 'expedicao',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                }
+            ],
+            products: [
+                {
+                    id: 1,
+                    name: 'Smartphone Galaxy S20',
+                    sku: 'ELET001',
+                    category: 'eletronicos',
+                    stock: 15,
+                    minStock: 10,
+                    price: 1999.99,
+                    description: 'Smartphone Samsung Galaxy S20 128GB',
+                    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 2.5,
+                    status: 'ativo'
+                },
+                {
+                    id: 2,
+                    name: 'Notebook Dell Inspiron',
+                    sku: 'INFO001',
+                    category: 'informatica',
+                    stock: 8,
+                    minStock: 5,
+                    price: 3500.00,
+                    description: 'Notebook Dell Inspiron 15" 8GB RAM 256GB SSD',
+                    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 1.2,
+                    status: 'ativo'
+                },
+                {
+                    id: 3,
+                    name: 'Mesa de Escritório',
+                    sku: 'MOVE001',
+                    category: 'moveis',
+                    stock: 3,
+                    minStock: 5,
+                    price: 450.00,
+                    description: 'Mesa de escritório em madeira 1.20m',
+                    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 0.8,
+                    status: 'ativo'
+                },
+                {
+                    id: 4,
+                    name: 'Camiseta Básica',
+                    sku: 'VEST001',
+                    category: 'vestuario',
+                    stock: 25,
+                    minStock: 15,
+                    price: 29.90,
+                    description: 'Camiseta básica 100% algodão',
+                    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 3.0,
+                    status: 'ativo'
+                },
+                {
+                    id: 5,
+                    name: 'Fone de Ouvido Bluetooth',
+                    sku: 'ELET002',
+                    category: 'eletronicos',
+                    stock: 5,
+                    minStock: 8,
+                    price: 199.90,
+                    description: 'Fone de ouvido sem fio com cancelamento de ruído',
+                    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 1.5,
+                    status: 'ativo'
+                }
+            ],
+            orders: [
+                {
+                    id: 1,
+                    customer: 'João Silva',
+                    items: [
+                        { productId: 1, quantity: 2, productName: 'Smartphone Galaxy S20' }
+                    ],
+                    status: 'pending',
+                    notes: 'Entregar urgente',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    customer: 'Maria Santos',
+                    items: [
+                        { productId: 2, quantity: 1, productName: 'Notebook Dell Inspiron' }
+                    ],
+                    status: 'processing',
+                    notes: '',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    customer: 'Pedro Oliveira',
+                    items: [
+                        { productId: 3, quantity: 1, productName: 'Mesa de Escritório' },
+                        { productId: 4, quantity: 3, productName: 'Camiseta Básica' }
+                    ],
+                    status: 'shipped',
+                    notes: 'Entregar após as 18h',
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            alerts: [
+                {
+                    id: 1,
+                    type: 'stock',
+                    message: 'Estoque baixo para Mesa de Escritório',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    type: 'rupture',
+                    message: 'Ruptura iminente para Notebook Dell Inspiron',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    type: 'stock',
+                    message: 'Estoque crítico para Fone de Ouvido Bluetooth',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            settings: {
+                lowStockDays: 7,
+                criticalStockDays: 3
+            }
+        };
+
+        // =============================================
+        // GERENCIADOR DE ESTADO
+        // =============================================
+
+        class StateManager {
+            constructor() {
+                // Recuperar dados do localStorage ou usar dados mock
+                const savedData = localStorage.getItem('smartstock_data');
+                if (savedData) {
+                    this.state = JSON.parse(savedData);
+                } else {
+                    this.state = {
+                        user: null,
+                        products: [...mockData.products],
+                        orders: [...mockData.orders],
+                        alerts: [...mockData.alerts],
+                        settings: {...mockData.settings},
+                        notifications: []
+                    };
+                    this.saveToLocalStorage();
+                }
+                
+                this.subscribers = [];
+            }
+
+            setState(newState) {
+                this.state = { ...this.state, ...newState };
+                this.saveToLocalStorage();
+                this.notifySubscribers();
+            }
+
+            subscribe(callback) {
+                this.subscribers.push(callback);
+                return () => {
+                    this.subscribers = this.subscribers.filter(sub => sub !== callback);
+                };
+            }
+
+            notifySubscribers() {
+                this.subscribers.forEach(callback => callback(this.state));
+            }
+
+            saveToLocalStorage() {
+                localStorage.setItem('smartstock_data', JSON.stringify(this.state));
+            }
+
+            addNotification(message, type = 'info') {
+                const notification = {
+                    id: Date.now(),
+                    message,
+                    type,
+                    timestamp: new Date()
+                };
+
+                this.setState({
+                    notifications: [...this.state.notifications, notification]
+                });
+
+                setTimeout(() => {
+                    this.removeNotification(notification.id);
+                }, 5000);
+            }
+
+            removeNotification(id) {
+                this.setState({
+                    notifications: this.state.notifications.filter(notif => notif.id !== id)
+                });
+            }
+
+            addProduct(product) {
+                const newProduct = {
+                    ...product,
+                    id: Math.max(...this.state.products.map(p => p.id)) + 1,
+                    image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    dailyDemand: 1.0,
+                    status: 'ativo'
+                };
+                this.setState({
+                    products: [...this.state.products, newProduct]
+                });
+            }
+
+            updateProduct(id, updates) {
+                this.setState({
+                    products: this.state.products.map(product => 
+                        product.id === id ? { ...product, ...updates } : product
+                    )
+                });
+            }
+
+            deleteProduct(id) {
+                this.setState({
+                    products: this.state.products.filter(product => product.id !== id)
+                });
+            }
+
+            addOrder(order) {
+                const newOrder = {
+                    ...order,
+                    id: Math.max(...this.state.orders.map(o => o.id)) + 1,
+                    createdAt: new Date().toISOString(),
+                    status: 'pending'
+                };
+                this.setState({
+                    orders: [...this.state.orders, newOrder]
+                });
+            }
+
+            updateOrderStatus(id, status) {
+                this.setState({
+                    orders: this.state.orders.map(order => 
+                        order.id === id ? { ...order, status } : order
+                    )
+                });
+            }
+
+            markAlertAsRead(alertId) {
+                this.setState({
+                    alerts: this.state.alerts.map(alert => 
+                        alert.id === alertId ? { ...alert, isRead: true } : alert
+                    )
+                });
+            }
+
+            markAllAlertsAsRead() {
+                this.setState({
+                    alerts: this.state.alerts.map(alert => ({ ...alert, isRead: true }))
+                });
+            }
+
+            addAlert(alert) {
+                const newAlert = {
+                    ...alert,
+                    id: Math.max(...this.state.alerts.map(a => a.id)) + 1,
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                };
+                this.setState({
+                    alerts: [...this.state.alerts, newAlert]
+                });
+            }
+
+            updateSettings(newSettings) {
+                this.setState({
+                    settings: { ...this.state.settings, ...newSettings }
+                });
+            }
+        }
+
+        // =============================================
+        // COMPONENTES DA INTERFACE
+        // =============================================
+
+        class NotificationManager {
+            constructor() {
+                this.container = document.getElementById('notificationsContainer');
+                this.setupStateSubscription();
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.renderNotifications(state.notifications);
+                });
+            }
+
+            renderNotifications(notifications) {
+                this.container.innerHTML = '';
+                
+                notifications.forEach(notification => {
+                    const notificationElement = this.createNotificationElement(notification);
+                    this.container.appendChild(notificationElement);
+                });
+            }
+
+            createNotificationElement(notification) {
+                const div = document.createElement('div');
+                div.className = `notification ${notification.type}`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span>${notification.message}</span>
+                        <button class="ml-4 text-white hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Adicionar evento para fechar
+                div.querySelector('button').addEventListener('click', () => {
+                    appState.removeNotification(notification.id);
+                });
+                
+                return div;
+            }
+        }
+
+        class LoginManager {
+            constructor() {
+                this.setupLoginForm();
+                this.checkAuthentication();
+            }
+
+            checkAuthentication() {
+                const user = JSON.parse(localStorage.getItem('smartstock_user'));
+                if (user) {
+                    this.showMainSystem(user);
+                }
+            }
+
+            setupLoginForm() {
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        
+                        const email = document.getElementById('email').value;
+                        const password = document.getElementById('password').value;
+                        
+                        this.handleLogin(email, password);
+                    });
+                }
+            }
+
+            handleLogin(email, password) {
+                const user = mockData.users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    localStorage.setItem('smartstock_user', JSON.stringify(user));
+                    appState.setState({ user });
+                    appState.addNotification('Login realizado com sucesso!', 'success');
+                    this.showMainSystem(user);
+                } else {
+                    appState.addNotification('Credenciais inválidas!', 'error');
+                }
+            }
+
+            setupLogout() {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        localStorage.removeItem('smartstock_user');
+                        window.location.reload();
+                    });
+                }
+            }
+
+            showMainSystem(user) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainSystem').classList.remove('hidden');
+                this.updateUserInfo(user);
+                this.setupLogout();
+            }
+
+            updateUserInfo(user) {
+                const userNameElement = document.getElementById('userName');
+                const userRoleElement = document.getElementById('userRole');
+                const userAvatarElement = document.getElementById('userAvatar');
+
+                if (userNameElement) userNameElement.textContent = user.name;
+                if (userRoleElement) userRoleElement.textContent = this.getRoleText(user.role);
+                if (userAvatarElement) userAvatarElement.src = user.avatar;
+
+                const adminSection = document.getElementById('adminSection');
+                if (adminSection) {
+                    if (user.role === 'admin') {
+                        adminSection.classList.remove('hidden');
+                    } else {
+                        adminSection.classList.add('hidden');
                     }
                 }
             }
-        });
 
-        // Simulando dados para a previsão de ruptura
-        function simulateStock(days, initialStock, dailyDemand) {
-            return initialStock - (dailyDemand * days);
+            getRoleText(role) {
+                const roles = {
+                    'admin': 'Administrador',
+                    'expedicao': 'Expedição'
+                };
+                return roles[role] || 'Usuário';
+            }
         }
+
+        class DashboardManager {
+            constructor() {
+                this.setupEventListeners();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Filtro de estoque
+                const stockFilter = document.getElementById('stockFilter');
+                if (stockFilter) {
+                    stockFilter.addEventListener('change', (e) => {
+                        this.filterStockTable(e.target.value);
+                    });
+                }
+
+                // Período de previsão
+                document.querySelectorAll('.forecast-period').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.forecast-period').forEach(b => b.classList.remove('active', 'bg-blue-100', 'text-blue-600'));
+                        e.target.classList.add('active', 'bg-blue-100', 'text-blue-600');
+                        this.changeForecastPeriod(parseInt(e.target.dataset.period));
+                    });
+                });
+
+                // Botão adicionar produto
+                const addProductBtn = document.getElementById('addProductBtn');
+                if (addProductBtn) {
+                    addProductBtn.addEventListener('click', () => {
+                        this.openProductModal();
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updateDashboard(state);
+                    this.updateStockTable(state.products);
+                });
+            }
+
+            updateDashboard(state) {
+                const totalItems = state.products.length;
+                const alertItems = state.products.filter(p => p.stock <= p.minStock).length;
+                const unreadAlerts = state.alerts.filter(a => !a.isRead).length;
+                
+                // Atualizar cards
+                document.getElementById('totalItems').textContent = totalItems;
+                document.getElementById('alertItems').textContent = alertItems;
+                document.getElementById('ruptureItems').textContent = unreadAlerts;
+                document.getElementById('lostSales').textContent = `R$ ${(alertItems * 150).toFixed(2)}`;
+
+                // Atualizar alertas de ruptura
+                this.updateRuptureAlerts(state.products);
+
+                // Atualizar contador de alertas
+                this.updateAlertCount(unreadAlerts);
+            }
+
+            updateRuptureAlerts(products) {
+                const container = document.getElementById('ruptureAlerts');
+                container.innerHTML = '';
+
+                const lowStockProducts = products.filter(p => p.stock <= p.minStock);
+                
+                if (lowStockProducts.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum alerta de ruptura no momento</p>';
+                    return;
+                }
+                
+                lowStockProducts.forEach(product => {
+                    const daysToRupture = Math.floor(product.stock / product.dailyDemand);
+                    const alertElement = document.createElement('div');
+                    alertElement.className = `p-4 rounded-lg ${daysToRupture <= 3 ? 'critical-stock' : 'low-stock'} bg-white shadow`;
+                    alertElement.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold">${product.name}</h4>
+                                <p class="text-sm text-gray-600">Estoque atual: ${product.stock} unidades</p>
+                                <p class="${daysToRupture <= 3 ? 'text-red-600' : 'text-orange-600'} text-sm mt-1">
+                                    <i class="fas ${daysToRupture <= 3 ? 'fa-fire' : 'fa-exclamation-circle'}"></i> 
+                                    Ruptura em ${daysToRupture} dias
+                                </p>
+                            </div>
+                            <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 reorder-btn" data-product-id="${product.id}">
+                                Reabastecer
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(alertElement);
+                });
+
+                // Adicionar eventos aos botões de reabastecimento
+                container.querySelectorAll('.reorder-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        this.reorderProduct(productId);
+                    });
+                });
+            }
+
+            updateStockTable(products) {
+                const tableBody = document.getElementById('stockTableBody');
+                tableBody.innerHTML = '';
+
+                if (products.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                Nenhum produto cadastrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                products.forEach(product => {
+                    const daysToRupture = Math.floor(product.stock / product.dailyDemand);
+                    let statusClass = 'bg-green-100 text-green-800';
+                    let statusText = 'Estável';
+                    
+                    if (daysToRupture <= 3) {
+                        statusClass = 'bg-red-100 text-red-800';
+                        statusText = 'Crítico';
+                    } else if (daysToRupture <= 7) {
+                        statusClass = 'bg-orange-100 text-orange-800';
+                        statusText = 'Alerta';
+                    }
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <img src="${product.image}" alt="${product.name}" class="h-10 w-10 rounded">
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                                    <div class="text-sm text-gray-500">SKU: ${product.sku}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.stock}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.dailyDemand}/dia</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm ${daysToRupture <= 3 ? 'text-red-600' : daysToRupture <= 7 ? 'text-orange-600' : 'text-green-600'} font-semibold">${daysToRupture} dias</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-product-btn" data-product-id="${product.id}">Editar</button>
+                            <button class="text-green-600 hover:text-green-900 reorder-btn" data-product-id="${product.id}">Pedido</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Adicionar eventos aos botões
+                tableBody.querySelectorAll('.edit-product-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        this.editProduct(productId);
+                    });
+                });
+
+                tableBody.querySelectorAll('.reorder-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        this.reorderProduct(productId);
+                    });
+                });
+            }
+
+            filterStockTable(filter) {
+                const rows = document.querySelectorAll('#stockTableBody tr');
+                rows.forEach(row => {
+                    if (row.cells.length < 5) return; // Pular linha de "nenhum produto"
+                    
+                    const statusCell = row.querySelector('span');
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else if (filter === 'alert' && (statusCell.textContent.includes('Alerta') || statusCell.textContent.includes('Crítico'))) {
+                        row.style.display = '';
+                    } else if (filter === 'stable' && statusCell.textContent.includes('Estável')) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            updateAlertCount(count) {
+                document.getElementById('alertCount').textContent = count;
+                const badge = document.getElementById('notificationBadge');
+                if (count > 0) {
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            reorderProduct(productId) {
+                const product = appState.state.products.find(p => p.id === productId);
+                if (product) {
+                    appState.updateProduct(productId, { stock: product.stock + 20 });
+                    appState.addNotification(`Produto ${product.name} reabastecido! +20 unidades`, 'success');
+                }
+            }
+
+            editProduct(productId) {
+                appState.addNotification(`Funcionalidade de edição em desenvolvimento para produto ID: ${productId}`, 'info');
+            }
+
+            openProductModal() {
+                document.getElementById('productModal').style.display = 'block';
+            }
+
+            changeForecastPeriod(period) {
+                appState.addNotification(`Período de previsão alterado para ${period} dias`, 'info');
+            }
+        }
+
+        class StockManager {
+            constructor() {
+                this.setupEventListeners();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Botões de ação
+                const addStockProductBtn = document.getElementById('addStockProductBtn');
+                if (addStockProductBtn) {
+                    addStockProductBtn.addEventListener('click', () => {
+                        this.openProductModal();
+                    });
+                }
+
+                const importStockBtn = document.getElementById('importStockBtn');
+                if (importStockBtn) {
+                    importStockBtn.addEventListener('click', () => {
+                        appState.addNotification('Funcionalidade de importação em desenvolvimento', 'info');
+                    });
+                }
+
+                const exportStockBtn = document.getElementById('exportStockBtn');
+                if (exportStockBtn) {
+                    exportStockBtn.addEventListener('click', () => {
+                        appState.addNotification('Funcionalidade de exportação em desenvolvimento', 'info');
+                    });
+                }
+
+                // Filtros
+                const categoryFilter = document.getElementById('categoryFilter');
+                if (categoryFilter) {
+                    categoryFilter.addEventListener('change', () => {
+                        this.applyFilters();
+                    });
+                }
+
+                const statusFilter = document.getElementById('statusFilter');
+                if (statusFilter) {
+                    statusFilter.addEventListener('change', () => {
+                        this.applyFilters();
+                    });
+                }
+
+                const searchStock = document.getElementById('searchStock');
+                if (searchStock) {
+                    searchStock.addEventListener('input', () => {
+                        this.applyFilters();
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updateStockManagementTable(state.products);
+                });
+            }
+
+            updateStockManagementTable(products) {
+                const tableBody = document.getElementById('stockManagementBody');
+                tableBody.innerHTML = '';
+
+                if (products.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                Nenhum produto cadastrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Aplicar filtros
+                const filteredProducts = this.applyFiltersToProducts(products);
+
+                filteredProducts.forEach(product => {
+                    const statusClass = product.stock <= product.minStock ? 
+                        'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                    const statusText = product.stock <= product.minStock ? 'Baixo' : 'Normal';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <img src="${product.image}" alt="${product.name}" class="h-10 w-10 rounded">
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                                    <div class="text-sm text-gray-500">SKU: ${product.sku}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 capitalize">${product.category}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.stock}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.minStock}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-stock-btn" data-product-id="${product.id}">Editar</button>
+                            <button class="text-red-600 hover:text-red-900 delete-stock-btn" data-product-id="${product.id}">Excluir</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Adicionar eventos aos botões
+                tableBody.querySelectorAll('.edit-stock-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        this.editProduct(productId);
+                    });
+                });
+
+                tableBody.querySelectorAll('.delete-stock-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        this.deleteProduct(productId);
+                    });
+                });
+            }
+
+            applyFilters() {
+                this.updateStockManagementTable(appState.state.products);
+            }
+
+            applyFiltersToProducts(products) {
+                const categoryFilter = document.getElementById('categoryFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                const searchTerm = document.getElementById('searchStock').value.toLowerCase();
+
+                return products.filter(product => {
+                    // Filtro por categoria
+                    if (categoryFilter && product.category !== categoryFilter) {
+                        return false;
+                    }
+
+                    // Filtro por status (estoque baixo)
+                    if (statusFilter === 'ativo' && product.stock <= product.minStock) {
+                        return false;
+                    }
+                    if (statusFilter === 'inativo' && product.stock > product.minStock) {
+                        return false;
+                    }
+
+                    // Filtro por busca
+                    if (searchTerm && 
+                        !product.name.toLowerCase().includes(searchTerm) && 
+                        !product.sku.toLowerCase().includes(searchTerm)) {
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            editProduct(productId) {
+                appState.addNotification(`Editando produto ID: ${productId}`, 'info');
+            }
+
+            deleteProduct(productId) {
+                if (confirm('Tem certeza que deseja excluir este produto?')) {
+                    appState.deleteProduct(productId);
+                    appState.addNotification('Produto excluído com sucesso!', 'success');
+                }
+            }
+
+            openProductModal() {
+                document.getElementById('productModal').style.display = 'block';
+            }
+        }
+
+        class ExpeditionManager {
+            constructor() {
+                this.setupEventListeners();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Botão novo pedido
+                const newOrderBtn = document.getElementById('newOrderBtn');
+                if (newOrderBtn) {
+                    newOrderBtn.addEventListener('click', () => {
+                        this.openOrderModal();
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updateExpeditionTables(state.orders, state.products);
+                });
+            }
+
+            updateExpeditionTables(orders, products) {
+                this.updatePendingOrders(orders);
+                this.updateExpeditionTable(orders, products);
+            }
+
+            updatePendingOrders(orders) {
+                const container = document.getElementById('pendingOrders');
+                container.innerHTML = '';
+
+                const pendingOrders = orders.filter(order => order.status === 'pending');
+                
+                if (pendingOrders.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido pendente</p>';
+                    return;
+                }
+
+                pendingOrders.forEach(order => {
+                    const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'p-4 bg-yellow-50 rounded-lg border border-yellow-200';
+                    orderElement.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold">Pedido #${order.id}</h4>
+                                <p class="text-sm text-gray-600">${order.customer}</p>
+                                <p class="text-sm text-gray-600 mt-1">${totalItems} itens</p>
+                            </div>
+                            <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 process-order-btn" data-order-id="${order.id}">
+                                Processar
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(orderElement);
+                });
+
+                // Adicionar eventos aos botões
+                container.querySelectorAll('.process-order-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = parseInt(e.target.dataset.orderId);
+                        this.processOrder(orderId);
+                    });
+                });
+            }
+
+            updateExpeditionTable(orders, products) {
+                const tableBody = document.getElementById('expeditionTableBody');
+                tableBody.innerHTML = '';
+
+                if (orders.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                Nenhum pedido cadastrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+                    const statusClass = this.getStatusClass(order.status);
+                    const statusText = this.getStatusText(order.status);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">#${order.id}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${order.customer}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${totalItems} itens</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${this.getActionButtons(order)}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Adicionar eventos aos botões
+                tableBody.querySelectorAll('.process-order-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = parseInt(e.target.dataset.orderId);
+                        this.processOrder(orderId);
+                    });
+                });
+
+                tableBody.querySelectorAll('.ship-order-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = parseInt(e.target.dataset.orderId);
+                        this.shipOrder(orderId);
+                    });
+                });
+
+                tableBody.querySelectorAll('.complete-order-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = parseInt(e.target.dataset.orderId);
+                        this.completeOrder(orderId);
+                    });
+                });
+            }
+
+            getStatusClass(status) {
+                const classes = {
+                    'pending': 'status-pending',
+                    'processing': 'status-processing',
+                    'shipped': 'status-shipped',
+                    'delivered': 'status-delivered'
+                };
+                return classes[status] || 'status-pending';
+            }
+
+            getStatusText(status) {
+                const texts = {
+                    'pending': 'Pendente',
+                    'processing': 'Processando',
+                    'shipped': 'Enviado',
+                    'delivered': 'Entregue'
+                };
+                return texts[status] || 'Pendente';
+            }
+
+            getActionButtons(order) {
+                if (order.status === 'pending') {
+                    return `<button class="text-blue-600 hover:text-blue-900 process-order-btn" data-order-id="${order.id}">Processar</button>`;
+                } else if (order.status === 'processing') {
+                    return `<button class="text-green-600 hover:text-green-900 ship-order-btn" data-order-id="${order.id}">Enviar</button>`;
+                } else if (order.status === 'shipped') {
+                    return `<button class="text-purple-600 hover:text-purple-900 complete-order-btn" data-order-id="${order.id}">Concluir</button>`;
+                } else {
+                    return `<span class="text-gray-500">Finalizado</span>`;
+                }
+            }
+
+            processOrder(orderId) {
+                appState.updateOrderStatus(orderId, 'processing');
+                appState.addNotification(`Pedido #${orderId} em processamento`, 'success');
+            }
+
+            shipOrder(orderId) {
+                appState.updateOrderStatus(orderId, 'shipped');
+                appState.addNotification(`Pedido #${orderId} enviado`, 'success');
+            }
+
+            completeOrder(orderId) {
+                appState.updateOrderStatus(orderId, 'delivered');
+                appState.addNotification(`Pedido #${orderId} concluído`, 'success');
+            }
+
+            openOrderModal() {
+                // Preencher seleção de produtos
+                const productSelects = document.querySelectorAll('.product-select');
+                productSelects.forEach(select => {
+                    select.innerHTML = '<option value="">Selecione um produto</option>';
+                    appState.state.products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = product.name;
+                        select.appendChild(option);
+                    });
+                });
+
+                document.getElementById('orderModal').style.display = 'block';
+            }
+        }
+
+        class ForecastManager {
+            constructor() {
+                this.setupEventListeners();
+                this.initializeCharts();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Seletor de período
+                const forecastPeriod = document.getElementById('forecastPeriod');
+                if (forecastPeriod) {
+                    forecastPeriod.addEventListener('change', (e) => {
+                        this.updateForecastChart(parseInt(e.target.value));
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updatePurchaseRecommendations(state.products);
+                });
+            }
+
+            initializeCharts() {
+                // Gráfico de demanda
+                const demandCtx = document.getElementById('demandChart');
+                if (demandCtx) {
+                    new Chart(demandCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1', '5', '10', '15', '20', '25', '30'],
+                            datasets: [{
+                                label: 'Demanda Prevista',
+                                data: [65, 59, 80, 81, 56, 55, 70],
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }, {
+                                label: 'Demanda Real',
+                                data: [60, 55, 75, 82, 54, 58, 65],
+                                borderColor: 'rgb(16, 185, 129)',
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de previsão
+                const forecastCtx = document.getElementById('forecastChart');
+                if (forecastCtx) {
+                    new Chart(forecastCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            datasets: [{
+                                label: 'Vendas 2023',
+                                data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 80],
+                                borderColor: 'rgb(59, 130, 246)',
+                                tension: 0.4,
+                                fill: false
+                            }, {
+                                label: 'Previsão 2024',
+                                data: [70, 65, 85, 88, 60, 58, 45, 50, 65, 75, 80, 85],
+                                borderColor: 'rgb(239, 68, 68)',
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de sazonalidade
+                const seasonalityCtx = document.getElementById('seasonalityChart');
+                if (seasonalityCtx) {
+                    new Chart(seasonalityCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            datasets: [{
+                                label: 'Fator de Sazonalidade',
+                                data: [1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.8, 0.9, 1.0, 1.1, 1.3, 1.4],
+                                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                                borderColor: 'rgb(59, 130, 246)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            updateForecastChart(period) {
+                appState.addNotification(`Gráfico de previsão atualizado para ${period} dias`, 'info');
+            }
+
+            updatePurchaseRecommendations(products) {
+                const container = document.getElementById('purchaseRecommendations');
+                container.innerHTML = '';
+
+                const lowStockProducts = products.filter(p => p.stock <= p.minStock);
+                
+                if (lowStockProducts.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma recomendação de compra no momento</p>';
+                    return;
+                }
+
+                lowStockProducts.forEach(product => {
+                    const recommendedQty = Math.max(product.minStock * 2, 20);
+                    const daysToRupture = Math.floor(product.stock / product.dailyDemand);
+                    
+                    const recommendationElement = document.createElement('div');
+                    recommendationElement.className = 'p-4 bg-blue-50 rounded-lg border border-blue-200';
+                    recommendationElement.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold">${product.name}</h4>
+                                <p class="text-sm text-gray-600">Estoque atual: ${product.stock} unidades</p>
+                                <p class="text-sm text-gray-600">Ruptura em: ${daysToRupture} dias</p>
+                                <p class="text-sm font-medium text-blue-700 mt-1">Recomendação: Comprar ${recommendedQty} unidades</p>
+                            </div>
+                            <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 purchase-btn" data-product-id="${product.id}" data-quantity="${recommendedQty}">
+                                Comprar
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(recommendationElement);
+                });
+
+                // Adicionar eventos aos botões
+                container.querySelectorAll('.purchase-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.dataset.productId);
+                        const quantity = parseInt(e.target.dataset.quantity);
+                        this.purchaseProduct(productId, quantity);
+                    });
+                });
+            }
+
+            purchaseProduct(productId, quantity) {
+                const product = appState.state.products.find(p => p.id === productId);
+                if (product) {
+                    appState.updateProduct(productId, { stock: product.stock + quantity });
+                    appState.addNotification(`Pedido de compra realizado: ${quantity} unidades de ${product.name}`, 'success');
+                }
+            }
+        }
+
+        class AlertManager {
+            constructor() {
+                this.setupEventListeners();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Botão marcar todos como lidos
+                const markAllReadBtn = document.getElementById('markAllReadBtn');
+                if (markAllReadBtn) {
+                    markAllReadBtn.addEventListener('click', () => {
+                        this.markAllAlertsAsRead();
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updateAlertsTable(state.alerts);
+                });
+            }
+
+            updateAlertsTable(alerts) {
+                const tableBody = document.getElementById('alertsTableBody');
+                tableBody.innerHTML = '';
+
+                if (alerts.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                Nenhum alerta no momento
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                alerts.forEach(alert => {
+                    const typeClass = this.getAlertTypeClass(alert.type);
+                    const typeText = this.getAlertTypeText(alert.type);
+                    const statusClass = alert.isRead ? 'bg-gray-100 text-gray-800' : 'bg-blue-100 text-blue-800';
+                    const statusText = alert.isRead ? 'Lido' : 'Não lido';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${typeClass}">${typeText}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">${alert.message}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${new Date(alert.createdAt).toLocaleDateString('pt-BR')}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${!alert.isRead ? `<button class="text-blue-600 hover:text-blue-900 mark-read-btn" data-alert-id="${alert.id}">Marcar como lido</button>` : '<span class="text-gray-400">Lido</span>'}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Adicionar eventos aos botões
+                tableBody.querySelectorAll('.mark-read-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const alertId = parseInt(e.target.dataset.alertId);
+                        this.markAlertAsRead(alertId);
+                    });
+                });
+            }
+
+            getAlertTypeClass(type) {
+                const classes = {
+                    'stock': 'bg-yellow-100 text-yellow-800',
+                    'rupture': 'bg-red-100 text-red-800',
+                    'system': 'bg-blue-100 text-blue-800'
+                };
+                return classes[type] || 'bg-gray-100 text-gray-800';
+            }
+
+            getAlertTypeText(type) {
+                const texts = {
+                    'stock': 'Estoque',
+                    'rupture': 'Ruptura',
+                    'system': 'Sistema'
+                };
+                return texts[type] || 'Geral';
+            }
+
+            markAlertAsRead(alertId) {
+                appState.markAlertAsRead(alertId);
+                appState.addNotification('Alerta marcado como lido', 'success');
+            }
+
+            markAllAlertsAsRead() {
+                appState.markAllAlertsAsRead();
+                appState.addNotification('Todos os alertas marcados como lidos', 'success');
+            }
+        }
+
+        class SettingsManager {
+            constructor() {
+                this.setupEventListeners();
+                this.setupStateSubscription();
+            }
+
+            setupEventListeners() {
+                // Botão salvar configurações
+                const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+                if (saveSettingsBtn) {
+                    saveSettingsBtn.addEventListener('click', () => {
+                        this.saveSettings();
+                    });
+                }
+
+                // Botão adicionar usuário
+                const addUserBtn = document.getElementById('addUserBtn');
+                if (addUserBtn) {
+                    addUserBtn.addEventListener('click', () => {
+                        this.addUser();
+                    });
+                }
+            }
+
+            setupStateSubscription() {
+                appState.subscribe((state) => {
+                    this.updateSettingsForm(state.settings);
+                    this.updateUsersList(state.user);
+                });
+            }
+
+            updateSettingsForm(settings) {
+                document.getElementById('lowStockDays').value = settings.lowStockDays;
+                document.getElementById('criticalStockDays').value = settings.criticalStockDays;
+            }
+
+            updateUsersList(currentUser) {
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = '';
+
+                mockData.users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.className = 'flex justify-between items-center p-3 bg-gray-50 rounded';
+                    userElement.innerHTML = `
+                        <div>
+                            <p class="text-sm font-medium">${user.name}</p>
+                            <p class="text-xs text-gray-500">${user.email} • ${user.role === 'admin' ? 'Administrador' : 'Expedição'}</p>
+                        </div>
+                        ${user.email !== currentUser?.email ? 
+                            `<button class="text-red-600 hover:text-red-800 text-sm delete-user-btn" data-user-email="${user.email}">
+                                <i class="fas fa-trash"></i>
+                            </button>` : 
+                            '<span class="text-xs text-gray-400">Usuário atual</span>'
+                        }
+                    `;
+                    usersList.appendChild(userElement);
+                });
+
+                // Adicionar eventos aos botões de exclusão
+                usersList.querySelectorAll('.delete-user-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const userEmail = e.target.closest('button').dataset.userEmail;
+                        this.deleteUser(userEmail);
+                    });
+                });
+            }
+
+            saveSettings() {
+                const lowStockDays = parseInt(document.getElementById('lowStockDays').value);
+                const criticalStockDays = parseInt(document.getElementById('criticalStockDays').value);
+
+                appState.updateSettings({
+                    lowStockDays,
+                    criticalStockDays
+                });
+
+                appState.addNotification('Configurações salvas com sucesso!', 'success');
+            }
+
+            addUser() {
+                appState.addNotification('Funcionalidade de adicionar usuário em desenvolvimento', 'info');
+            }
+
+            deleteUser(userEmail) {
+                if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                    appState.addNotification('Funcionalidade de excluir usuário em desenvolvimento', 'info');
+                }
+            }
+        }
+
+        // =============================================
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        // =============================================
+
+        class SmartStockApp {
+            constructor() {
+                this.components = {};
+                this.init();
+            }
+
+            init() {
+                // Inicializar componentes
+                this.components.notificationManager = new NotificationManager();
+                this.components.loginManager = new LoginManager();
+                this.components.dashboardManager = new DashboardManager();
+                this.components.stockManager = new StockManager();
+                this.components.expeditionManager = new ExpeditionManager();
+                this.components.forecastManager = new ForecastManager();
+                this.components.alertManager = new AlertManager();
+                this.components.settingsManager = new SettingsManager();
+
+                // Configurar navegação
+                this.setupNavigation();
+
+                // Configurar modais
+                this.setupModals();
+
+                console.log('Sistema SmartStock inicializado com sucesso!');
+            }
+
+            setupNavigation() {
+                document.querySelectorAll('a[data-page]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = e.target.getAttribute('data-page') || 
+                                    e.target.closest('a').getAttribute('data-page');
+                        this.switchPage(page);
+                    });
+                });
+
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', this.toggleSidebar);
+                }
+            }
+
+            switchPage(page) {
+                document.querySelectorAll('.page-content').forEach(p => {
+                    p.classList.remove('active');
+                });
+
+                document.querySelectorAll('nav a').forEach(link => {
+                    link.classList.remove('active-page');
+                });
+
+                const pageElement = document.getElementById(page);
+                if (pageElement) {
+                    pageElement.classList.add('active');
+                }
+
+                const activeLink = document.querySelector(`a[data-page="${page}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active-page');
+                }
+
+                this.updatePageTitle(page);
+            }
+
+            updatePageTitle(page) {
+                const titles = {
+                    dashboard: 'Dashboard',
+                    estoque: 'Gestão de Estoque',
+                    expedicao: 'Expedição',
+                    previsoes: 'Previsões',
+                    alertas: 'Alertas',
+                    configuracoes: 'Configurações'
+                };
+                
+                const titleElement = document.getElementById('pageTitle');
+                if (titleElement) {
+                    titleElement.textContent = titles[page] || 'SmartStock';
+                }
+            }
+
+            toggleSidebar() {
+                const sidebar = document.querySelector('.sidebar');
+                const mainContent = document.getElementById('mainContent');
+                
+                sidebar.classList.toggle('sidebar-collapsed');
+            }
+
+            setupModals() {
+                // Modal de produto
+                const productModal = document.getElementById('productModal');
+                const closeProductModal = document.getElementById('closeProductModal');
+                const cancelProductBtn = document.getElementById('cancelProductBtn');
+                const productForm = document.getElementById('productForm');
+
+                if (closeProductModal) {
+                    closeProductModal.addEventListener('click', () => {
+                        productModal.style.display = 'none';
+                    });
+                }
+
+                if (cancelProductBtn) {
+                    cancelProductBtn.addEventListener('click', () => {
+                        productModal.style.display = 'none';
+                    });
+                }
+
+                if (productForm) {
+                    productForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleProductSubmit();
+                    });
+                }
+
+                // Modal de pedido
+                const orderModal = document.getElementById('orderModal');
+                const closeOrderModal = document.getElementById('closeOrderModal');
+                const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+                const orderForm = document.getElementById('orderForm');
+                const addOrderItemBtn = document.getElementById('addOrderItemBtn');
+
+                if (closeOrderModal) {
+                    closeOrderModal.addEventListener('click', () => {
+                        orderModal.style.display = 'none';
+                    });
+                }
+
+                if (cancelOrderBtn) {
+                    cancelOrderBtn.addEventListener('click', () => {
+                        orderModal.style.display = 'none';
+                    });
+                }
+
+                if (orderForm) {
+                    orderForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleOrderSubmit();
+                    });
+                }
+
+                if (addOrderItemBtn) {
+                    addOrderItemBtn.addEventListener('click', () => {
+                        this.addOrderItem();
+                    });
+                }
+
+                // Fechar modais ao clicar fora
+                window.addEventListener('click', (e) => {
+                    if (e.target === productModal) {
+                        productModal.style.display = 'none';
+                    }
+                    if (e.target === orderModal) {
+                        orderModal.style.display = 'none';
+                    }
+                });
+            }
+
+            handleProductSubmit() {
+                const formData = {
+                    name: document.getElementById('productName').value,
+                    sku: document.getElementById('productSKU').value,
+                    category: document.getElementById('productCategory').value,
+                    stock: parseInt(document.getElementById('productStock').value),
+                    minStock: parseInt(document.getElementById('productMinStock').value),
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    description: document.getElementById('productDescription').value
+                };
+
+                appState.addProduct(formData);
+                document.getElementById('productModal').style.display = 'none';
+                document.getElementById('productForm').reset();
+                appState.addNotification('Produto criado com sucesso!', 'success');
+            }
+
+            addOrderItem() {
+                const orderItems = document.getElementById('orderItems');
+                const newItem = document.createElement('div');
+                newItem.className = 'flex space-x-2 items-center';
+                newItem.innerHTML = `
+                    <select class="product-select border rounded px-3 py-2 flex-1">
+                        <option value="">Selecione um produto</option>
+                    </select>
+                    <input type="number" class="quantity-input border rounded px-3 py-2 w-20" placeholder="Qtd" min="1" value="1">
+                    <button type="button" class="remove-item-btn text-red-600 hover:text-red-800">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+
+                // Preencher seleção de produtos
+                const productSelect = newItem.querySelector('.product-select');
+                appState.state.products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = product.name;
+                    productSelect.appendChild(option);
+                });
+
+                // Adicionar evento para remover item
+                newItem.querySelector('.remove-item-btn').addEventListener('click', function() {
+                    newItem.remove();
+                });
+
+                orderItems.appendChild(newItem);
+            }
+
+            handleOrderSubmit() {
+                const customer = document.getElementById('orderCustomer').value;
+                const notes = document.getElementById('orderNotes').value;
+                
+                // Coletar itens do pedido
+                const items = [];
+                document.querySelectorAll('#orderItems .flex.space-x-2').forEach(itemEl => {
+                    const productSelect = itemEl.querySelector('.product-select');
+                    const quantityInput = itemEl.querySelector('.quantity-input');
+                    
+                    if (productSelect.value && quantityInput.value) {
+                        const product = appState.state.products.find(p => p.id === parseInt(productSelect.value));
+                        if (product) {
+                            items.push({
+                                productId: product.id,
+                                quantity: parseInt(quantityInput.value),
+                                productName: product.name
+                            });
+                        }
+                    }
+                });
+
+                if (items.length === 0) {
+                    appState.addNotification('Adicione pelo menos um item ao pedido', 'error');
+                    return;
+                }
+
+                const orderData = {
+                    customer,
+                    items,
+                    notes
+                };
+
+                appState.addOrder(orderData);
+                document.getElementById('orderModal').style.display = 'none';
+                document.getElementById('orderForm').reset();
+                
+                // Limpar itens do pedido (manter apenas o primeiro)
+                const orderItems = document.getElementById('orderItems');
+                orderItems.innerHTML = '';
+                this.addOrderItem();
+                
+                appState.addNotification('Pedido criado com sucesso!', 'success');
+            }
+        }
+
+        // Inicializar aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            window.appState = new StateManager();
+            window.smartStockApp = new SmartStockApp();
+        });
     </script>
 </body>
 </html>
-
